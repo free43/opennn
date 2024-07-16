@@ -295,6 +295,11 @@ TrainingResults AdaptiveMomentEstimation::perform_training()
 
     if(neural_network_pointer->has_scaling_layer())
     {
+        // for(Index i = 0; i < input_variables_indices.size(); i++)
+        // {
+        //     cout << "Scaler: " << (int)input_variables_scalers[i] << endl;
+        // }
+        // while(1);
         ScalingLayer* scaling_layer_pointer = neural_network_pointer->get_scaling_layer_pointer();
         scaling_layer_pointer->set(input_variables_descriptives, input_variables_scalers);
     }

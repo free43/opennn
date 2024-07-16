@@ -487,7 +487,7 @@ void ScalingLayer::set_default()
     layer_name = "scaling_layer";
 
     set_scalers(Scaler::MeanStandardDeviation);
-
+    
     set_min_max_range(type(-1), type(1));
 
     set_display(true);
@@ -750,7 +750,9 @@ void ScalingLayer::set_scalers(const string& new_scaling_methods_string)
 void ScalingLayer::set_scalers(const Scaler& new_scaling_method)
 {
     const Index neurons_number = get_neurons_number();
-
+    // cout << "Scaler chosen: " << (int)new_scaling_method << endl;
+    // if(new_scaling_method == Scaler::NoScaling) {while(1);}
+    // cout << "Scaler chosen: " << (int)new_scaling_method << endl;
     for(Index i = 0; i < neurons_number; i++)
     {
         scalers(i) = new_scaling_method;
@@ -882,63 +884,63 @@ void ScalingLayer::forward_propagate(type* inputs_data, const Tensor<Index, 1>& 
         for(Index i = 0; i < neurons_number; i++)
         {
             const Scaler scaler = scalers(i);
-
+            // throw invalid_argument("Scaler: " + to_string((int)scaler));
             Tensor<type, 1> column = inputs.chip(i, 1);
-
-            if(abs(descriptives(i).standard_deviation) < type(NUMERIC_LIMITS_MIN))
+            // cout << "@forward_prop Scaler: " << (int)scaler << ", " << (int)Scaler::NoScaling << endl;
+            if(scaler == Scaler::NoScaling)
             {
-                if(display)
-                {
-                    cout << "display: " << display << endl;
-                    cout << "OpenNN Warning: ScalingLayer class.\n"
-                         << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
-                         << "Standard deviation of variable " << i << " is zero.\n"
-                         << "Those variables won't be scaled.\n";
-                }
+
             }
             else
             {
-                if(scaler == Scaler::NoScaling)
+                if(abs(descriptives(i).standard_deviation) < type(NUMERIC_LIMITS_MIN))
                 {
-
-                }
-                else if(scaler == Scaler::MinimumMaximum)
-                {
-                    const type slope =
-                            (max_range-min_range)/(descriptives(i).maximum-descriptives(i).minimum);
-
-                    const type intercept =
-                            (min_range*descriptives(i).maximum-max_range*descriptives(i).minimum)/(descriptives(i).maximum-descriptives(i).minimum);
-
-                    column = intercept + slope*inputs.chip(i, 1);
-                }
-                else if(scaler == Scaler::MeanStandardDeviation)
-                {
-                    const type slope = static_cast<type>(1)/descriptives(i).standard_deviation;
-
-                    const type intercept = -descriptives(i).mean/descriptives(i).standard_deviation;
-
-                    column = intercept + slope*inputs.chip(i, 1);
-                }
-                else if(scaler == Scaler::StandardDeviation)
-                {
-                    column = static_cast<type>(1/descriptives(i).standard_deviation) * inputs.chip(i, 1);/*column/static_cast<type>(descriptives(i).standard_deviation);*/
-                }
-                else if(scaler == Scaler::Logarithm)
-                {
-                    column = inputs.chip(i,1).log();
+                    if(display)
+                    {
+                        cout << "display:@@ " << display << endl;
+                        cout << "OpenNN Warning: ScalingLayer class.\n"
+                            << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
+                            << "Standard deviation of variable " << i << " is zero.\n"
+                            << "Those variables won't be scaled.\n";
+                    }
                 }
                 else
                 {
-                    ostringstream buffer;
+                    if(scaler == Scaler::MinimumMaximum)
+                    {
+                        const type slope =
+                                (max_range-min_range)/(descriptives(i).maximum-descriptives(i).minimum);
 
-                    buffer << "OpenNN Exception: ScalingLayer class\n"
-                           << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
-                           << "Unknown scaling method.\n";
+                        const type intercept =
+                                (min_range*descriptives(i).maximum-max_range*descriptives(i).minimum)/(descriptives(i).maximum-descriptives(i).minimum);
 
-                    throw invalid_argument(buffer.str());
+                        column = intercept + slope*inputs.chip(i, 1);
+                    }
+                    else if(scaler == Scaler::MeanStandardDeviation)
+                    {
+                        const type slope = static_cast<type>(1)/descriptives(i).standard_deviation;
+
+                        const type intercept = -descriptives(i).mean/descriptives(i).standard_deviation;
+
+                        column = intercept + slope*inputs.chip(i, 1);
+                    }
+                    else if(scaler == Scaler::StandardDeviation)
+                    {
+                        column = static_cast<type>(1/descriptives(i).standard_deviation) * inputs.chip(i, 1);/*column/static_cast<type>(descriptives(i).standard_deviation);*/
+                    }
+                    else if(scaler == Scaler::Logarithm)
+                    {
+                        column = inputs.chip(i,1).log();
+                    }
+                    else
+                    {
+                        ostringstream buffer;
+                        buffer << "OpenNN Exception: ScalingLayer class\n"
+                            << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
+                            << "Unknown scaling method.\n";
+                        throw invalid_argument(buffer.str());
+                    }
                 }
-
             }
             outputs.chip(i, 1) = column;
         }
@@ -1002,62 +1004,63 @@ void ScalingLayer::calculate_outputs(type* inputs_data, const Tensor<Index, 1>& 
             const Scaler scaler = scalers(i);
 
             Tensor<type, 1> column = inputs.chip(i, 1);
-
-            if(abs(descriptives(i).standard_deviation) < type(NUMERIC_LIMITS_MIN))
+            // cout << "@calc Scaler: " << (int)scaler << ", " << (int)Scaler::NoScaling << endl;
+            if(scaler == Scaler::NoScaling)
             {
-                if(display)
-                {
-                    cout << "display: " << display << endl;
-                    cout << "OpenNN Warning: ScalingLayer class.\n"
-                         << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
-                         << "Standard deviation of variable " << i << " is zero.\n"
-                         << "Those variables won't be scaled.\n";
-                }
+
             }
             else
-            {
-                if(scaler == Scaler::NoScaling)
                 {
-
-                }
-                else if(scaler == Scaler::MinimumMaximum)
+                if(abs(descriptives(i).standard_deviation) < type(NUMERIC_LIMITS_MIN))
                 {
-                    const type slope =
-                            (max_range-min_range)/(descriptives(i).maximum-descriptives(i).minimum);
-
-                    const type intercept =
-                            (min_range*descriptives(i).maximum-max_range*descriptives(i).minimum)/(descriptives(i).maximum-descriptives(i).minimum);
-
-                    column = intercept + slope*inputs.chip(i, 1);
-                }
-                else if(scaler == Scaler::MeanStandardDeviation)
-                {
-                    const type slope = static_cast<type>(1)/descriptives(i).standard_deviation;
-
-                    const type intercept = -descriptives(i).mean/descriptives(i).standard_deviation;
-
-                    column = intercept + slope*inputs.chip(i, 1);
-                }
-                else if(scaler == Scaler::StandardDeviation)
-                {
-                    column = static_cast<type>(1/descriptives(i).standard_deviation) * inputs.chip(i, 1);/*column/static_cast<type>(descriptives(i).standard_deviation);*/
-                }
-                else if(scaler == Scaler::Logarithm)
-                {
-                    column = inputs.chip(i,1).log();
+                    if(display)
+                    {
+                        cout << "display:@@ " << display << endl;
+                        cout << "OpenNN Warning: ScalingLayer class.\n"
+                            << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
+                            << "Standard deviation of variable " << i << " is zero.\n"
+                            << "Those variables won't be scaled.\n";
+                    }
                 }
                 else
-                {
-                    ostringstream buffer;
+                    {
+                        if(scaler == Scaler::MinimumMaximum)
+                        {
+                            const type slope =
+                                    (max_range-min_range)/(descriptives(i).maximum-descriptives(i).minimum);
 
-                    buffer << "OpenNN Exception: ScalingLayer class\n"
-                           << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
-                           << "Unknown scaling method.\n";
+                            const type intercept =
+                                    (min_range*descriptives(i).maximum-max_range*descriptives(i).minimum)/(descriptives(i).maximum-descriptives(i).minimum);
 
-                    throw invalid_argument(buffer.str());
+                            column = intercept + slope*inputs.chip(i, 1);
+                        }
+                        else if(scaler == Scaler::MeanStandardDeviation)
+                        {
+                            const type slope = static_cast<type>(1)/descriptives(i).standard_deviation;
+
+                            const type intercept = -descriptives(i).mean/descriptives(i).standard_deviation;
+
+                            column = intercept + slope*inputs.chip(i, 1);
+                        }
+                        else if(scaler == Scaler::StandardDeviation)
+                        {
+                            column = static_cast<type>(1/descriptives(i).standard_deviation) * inputs.chip(i, 1);/*column/static_cast<type>(descriptives(i).standard_deviation);*/
+                        }
+                        else if(scaler == Scaler::Logarithm)
+                        {
+                            column = inputs.chip(i,1).log();
+                        }
+                        else
+                        {
+                            ostringstream buffer;
+
+                            buffer << "OpenNN Exception: ScalingLayer class\n"
+                                << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
+                                << "Unknown scaling method.\n";
+                            throw invalid_argument(buffer.str());
+                        }
+                    }
                 }
-
-            }
             outputs.chip(i, 1) = column;
         }
     }
