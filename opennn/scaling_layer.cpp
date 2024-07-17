@@ -750,9 +750,6 @@ void ScalingLayer::set_scalers(const string& new_scaling_methods_string)
 void ScalingLayer::set_scalers(const Scaler& new_scaling_method)
 {
     const Index neurons_number = get_neurons_number();
-    // cout << "Scaler chosen: " << (int)new_scaling_method << endl;
-    // if(new_scaling_method == Scaler::NoScaling) {while(1);}
-    // cout << "Scaler chosen: " << (int)new_scaling_method << endl;
     for(Index i = 0; i < neurons_number; i++)
     {
         scalers(i) = new_scaling_method;
@@ -884,9 +881,7 @@ void ScalingLayer::forward_propagate(type* inputs_data, const Tensor<Index, 1>& 
         for(Index i = 0; i < neurons_number; i++)
         {
             const Scaler scaler = scalers(i);
-            // throw invalid_argument("Scaler: " + to_string((int)scaler));
             Tensor<type, 1> column = inputs.chip(i, 1);
-            // cout << "@forward_prop Scaler: " << (int)scaler << ", " << (int)Scaler::NoScaling << endl;
             if(scaler == Scaler::NoScaling)
             {
 
@@ -897,7 +892,7 @@ void ScalingLayer::forward_propagate(type* inputs_data, const Tensor<Index, 1>& 
                 {
                     if(display)
                     {
-                        cout << "display:@@ " << display << endl;
+                        cout << "display: " << display << endl;
                         cout << "OpenNN Warning: ScalingLayer class.\n"
                             << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
                             << "Standard deviation of variable " << i << " is zero.\n"
@@ -1004,7 +999,6 @@ void ScalingLayer::calculate_outputs(type* inputs_data, const Tensor<Index, 1>& 
             const Scaler scaler = scalers(i);
 
             Tensor<type, 1> column = inputs.chip(i, 1);
-            // cout << "@calc Scaler: " << (int)scaler << ", " << (int)Scaler::NoScaling << endl;
             if(scaler == Scaler::NoScaling)
             {
 
@@ -1015,7 +1009,7 @@ void ScalingLayer::calculate_outputs(type* inputs_data, const Tensor<Index, 1>& 
                 {
                     if(display)
                     {
-                        cout << "display:@@ " << display << endl;
+                        cout << "display: " << display << endl;
                         cout << "OpenNN Warning: ScalingLayer class.\n"
                             << "Tensor<type, 2> calculate_outputs(const Tensor<type, 2>&) const method.\n"
                             << "Standard deviation of variable " << i << " is zero.\n"
@@ -1241,7 +1235,6 @@ string ScalingLayer::write_expression(const Tensor<string, 1>& inputs_names, con
 
 void ScalingLayer::print() const
 {
-    cout << "Scaling layer" << endl;
 
     const Index inputs_number = get_inputs_number();
 
