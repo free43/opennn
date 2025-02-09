@@ -31,6 +31,8 @@ namespace opennn
 
 class CrossEntropyError : public LossIndex
 {
+private: 
+    Tensor<type,1> epsilon(1);
 
 public:
 
