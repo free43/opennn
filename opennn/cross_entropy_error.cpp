@@ -18,7 +18,6 @@ namespace opennn
 
 CrossEntropyError::CrossEntropyError() : LossIndex()
 {
-    epsilon(0) = 1e-7;
 }
 
 
@@ -31,7 +30,6 @@ CrossEntropyError::CrossEntropyError() : LossIndex()
 CrossEntropyError::CrossEntropyError(NeuralNetwork* new_neural_network_pointer, DataSet* new_data_set_pointer)
     : LossIndex(new_neural_network_pointer, new_data_set_pointer)
 {
-    epsilon(0) = 1e-7;
 }
 
 
@@ -90,13 +88,13 @@ void CrossEntropyError::calculate_binary_error(const DataSetBatch& batch,
 
     const TensorMap<Tensor<type, 2>> targets(batch.targets_data, batch.targets_dimensions(0), batch.targets_dimensions(1));
 
-    Tensor<type, 2> binary_cross_entropy = - ((type(1)-targets)*((type(1)-(outputs+epsilon)).log()));
+    Tensor<type, 2> binary_cross_entropy = - ((type(1)-targets)*((type(1)-outputs).log()));
 
     std::replace_if(binary_cross_entropy.data(), binary_cross_entropy.data()+binary_cross_entropy.size(), [](type x){return isnan(x);}, 0);
 
     Tensor<type, 0> cross_entropy_error;
 
-    cross_entropy_error.device(*thread_pool_device) = -(targets*((outputs+epsilon).log())).sum() + binary_cross_entropy.sum();
+    cross_entropy_error.device(*thread_pool_device) = -(targets*(outputs.log())).sum() + binary_cross_entropy.sum();
 
     back_propagation.error = cross_entropy_error()/static_cast<type>(batch_samples_number);
 
@@ -129,7 +127,7 @@ void CrossEntropyError::calculate_multiple_error(const DataSetBatch& batch,
     const TensorMap<Tensor<type, 2>> targets(batch.targets_data, batch.targets_dimensions(0), batch.targets_dimensions(1));
 
     Tensor<type, 0> cross_entropy_error;
-    cross_entropy_error.device(*thread_pool_device) = -(targets*((outputs+epsilon).log())).sum();
+    cross_entropy_error.device(*thread_pool_device) = -(targets*(outputs.log())).sum();
 
     back_propagation.error = cross_entropy_error()/static_cast<type>(batch_samples_number);
 
